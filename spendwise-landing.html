@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpendWise — The app your bank wishes it built</title>
+  <meta name="description" content="SpendWise is a UK-first Android app that scans receipts, tracks item-level spending, reminds you before returns expire, and helps you understand what you actually bought — without connecting to your bank." />
+  <meta name="theme-color" content="#07111F" />
+  <meta property="og:title" content="SpendWise — The app your bank wishes it built" />
+  <meta property="og:description" content="Scan receipts. See what you actually bought. Track return deadlines. No bank login required." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://valexander26.github.io/spendwise-landing-page/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    :root {
+      --navy-950: #050B14;
+      --navy-900: #07111F;
+      --navy-850: #0A1628;
+      --navy-800: #0E1D33;
+      --navy-700: #132A45;
+      --cream: #F2F0EC;
+      --cream-2: #FFF9EC;
+      --muted: #9EACBE;
+      --muted-2: #C8D0DA;
+      --white: #FFFFFF;
+      --blue: #5AA7FF;
+      --green: #65E6A6;
+      --amber: #FFD36A;
+      --red: #FF6B6B;
+      --purple: #A98BFF;
+      --pink: #FF9FC7;
+      --card: rgba(255, 255, 255, 0.075);
+      --card-strong: rgba(255, 255, 255, 0.115);
+      --border: rgba(255, 255, 255, 0.13);
+      --border-strong: rgba(255, 255, 255, 0.24);
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.36);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-pill: 999px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(90, 167, 255, 0.16), transparent 30%),
+        radial-gradient(circle at 84% 2%, rgba(101, 230, 166, 0.11), transparent 28%),
+        radial-gradient(circle at 50% 45%, rgba(169, 139, 255, 0.10), transparent 38%),
+        var(--navy-950);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+      z-index: -1;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    .shell { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(22px);
+      background: rgba(5, 11, 20, 0.74);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .nav-inner {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 850; letter-spacing: -0.04em; }
+    .mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.25), transparent),
+        linear-gradient(135deg, var(--blue), var(--green));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 12px 30px rgba(90, 167, 255, 0.24);
+      color: var(--navy-950);
+      font-size: 22px;
+      font-weight: 950;
+    }
+
+    .nav-links { display: flex; gap: 24px; align-items: center; color: var(--muted-2); font-size: 14px; font-weight: 700; }
+    .nav-links a { transition: color .2s ease; }
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-actions { display: flex; gap: 10px; align-items: center; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      font-weight: 850;
+      font-size: 14px;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      color: #06101D;
+      background: linear-gradient(135deg, #FFFFFF, #DFF0FF 42%, #BFEFD5);
+      box-shadow: 0 16px 42px rgba(90, 167, 255, 0.22);
+      border-color: rgba(255,255,255,0.4);
+    }
+    .btn-secondary { background: rgba(255,255,255,0.07); color: var(--white); }
+    .btn-secondary:hover { border-color: var(--border-strong); background: rgba(255,255,255,0.11); }
+    .btn-dark { background: rgba(5,11,20,0.72); border-color: rgba(255,255,255,0.16); color: var(--white); }
+
+    .mobile-toggle { display: none; }
+
+    .hero {
+      padding: 86px 0 76px;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(101, 230, 166, 0.28);
+      background: rgba(101, 230, 166, 0.09);
+      border-radius: var(--radius-pill);
+      color: #BFF7DA;
+      font-size: 13px;
+      font-weight: 850;
+      margin-bottom: 18px;
+    }
+    .pulse { width: 8px; height: 8px; border-radius: 99px; background: var(--green); box-shadow: 0 0 0 7px rgba(101, 230, 166, 0.12); }
+
+    h1 {
+      font-size: clamp(46px, 7vw, 86px);
+      line-height: 0.92;
+      letter-spacing: -0.075em;
+      margin: 0 0 24px;
+      max-width: 760px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #FFFFFF 12%, #BFDFFF 42%, #BFF7DA 72%, #FFF1B8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      font-size: clamp(18px, 2.2vw, 22px);
+      line-height: 1.55;
+      color: var(--muted-2);
+      max-width: 680px;
+      margin: 0 0 28px;
+    }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 32px 0 22px; }
+
+    .trust-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .trust-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,0.065);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: var(--muted-2);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .visual-wrap { position: relative; min-height: 680px; display: grid; place-items: center; }
+    .phone {
+      width: min(365px, 88vw);
+      min-height: 690px;
+      border-radius: 48px;
+      background: linear-gradient(145deg, #172943, #07111F 48%, #020710);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: var(--shadow), inset 0 0 0 8px rgba(255,255,255,0.035);
+      padding: 18px;
+      transform: rotate(2deg);
+      position: relative;
+    }
+    .phone::before {
+      content: "";
+      width: 112px;
+      height: 26px;
+      border-radius: 0 0 18px 18px;
+      background: #050B14;
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    .screen {
+      border-radius: 36px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(90,167,255,0.20), transparent 32%),
+        linear-gradient(180deg, #101F35, #07111F 55%, #06101D);
+      min-height: 654px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 58px 18px 18px;
+      position: relative;
+    }
+
+    .status { display: flex; justify-content: space-between; align-items: center; color: rgba(255,255,255,0.72); font-size: 12px; font-weight: 800; margin-bottom: 18px; }
+    .app-header { margin-bottom: 18px; }
+    .app-kicker { color: var(--muted); font-size: 12px; font-weight: 850; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+    .app-title { font-size: 28px; font-weight: 950; letter-spacing: -0.055em; }
+
+    .balance-card {
+      background: linear-gradient(150deg, rgba(255,255,255,0.18), rgba(255,255,255,0.07));
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 28px;
+      padding: 22px;
+      box-shadow: 0 20px 46px rgba(0,0,0,0.28);
+      margin-bottom: 14px;
+    }
+    .balance-card small { display: block; color: var(--muted-2); margin-bottom: 8px; font-weight: 750; }
+    .money { font-size: 45px; line-height: 1; font-weight: 950; letter-spacing: -0.07em; }
+    .forecast { margin-top: 14px; color: #FFE39E; font-size: 13px; font-weight: 800; }
+
+    .receipt-card {
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 24px;
+      padding: 18px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .receipt-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 18px 0;
+      height: 1px;
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,0.36) 0 8px, transparent 8px 14px);
+    }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    .store { display: flex; align-items: center; gap: 10px; font-weight: 900; }
+    .avatar { width: 36px; height: 36px; border-radius: 13px; display: grid; place-items: center; background: #00539F; font-size: 16px; font-weight: 950; }
+    .items { margin: 16px 0 0; display: grid; gap: 9px; color: var(--muted-2); font-size: 13px; }
+    .item-line { display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.12); padding-bottom: 8px; }
+    .scan-fab { width: 66px; height: 66px; margin: 18px auto 0; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--green)); display: grid; place-items: center; color: #06101D; font-size: 24px; font-weight: 950; box-shadow: 0 20px 44px rgba(90,167,255,0.30); }
+
+    .float-card {
+      position: absolute;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(12, 28, 48, 0.82);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.28);
+      padding: 16px;
+      max-width: 230px;
+    }
+    .float-card.one { left: 0; top: 112px; transform: rotate(-5deg); }
+    .float-card.two { right: 0; bottom: 112px; transform: rotate(5deg); }
+    .float-title { font-weight: 950; letter-spacing: -0.03em; margin-bottom: 5px; }
+    .float-copy { color: var(--muted-2); font-size: 13px; line-height: 1.45; }
+
+    section { padding: 80px 0; }
+    .section-head { max-width: 780px; margin: 0 auto 42px; text-align: center; }
+    .section-kicker { color: var(--green); font-size: 13px; font-weight: 950; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 12px; }
+    h2 { font-size: clamp(34px, 5vw, 58px); line-height: 0.98; letter-spacing: -0.065em; margin: 0 0 18px; }
+    .section-copy { color: var(--muted-2); font-size: 18px; line-height: 1.6; margin: 0 auto; max-width: 720px; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+
+    .feature-card, .story-card, .faq-card {
+      background: linear-gradient(180deg, var(--card-strong), rgba(255,255,255,0.045));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 26px;
+      box-shadow: 0 18px 55px rgba(0,0,0,0.18);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before, .story-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 18% 0%, rgba(255,255,255,0.12), transparent 28%);
+      opacity: .72;
+      pointer-events: none;
+    }
+    .icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.13);
+      display: grid;
+      place-items: center;
+      font-size: 25px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+    .feature-card h3, .story-card h3 { font-size: 22px; line-height: 1.05; margin: 0 0 12px; letter-spacing: -0.045em; position: relative; }
+    .feature-card p, .story-card p, .faq-card p { margin: 0; color: var(--muted-2); line-height: 1.6; position: relative; }
+
+    .problem {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 42px;
+    }
+    .compare-card {
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      border: 1px solid var(--border);
+      min-height: 330px;
+      background: rgba(255,255,255,0.055);
+    }
+    .compare-card.good { background: linear-gradient(145deg, rgba(101,230,166,0.12), rgba(255,255,255,0.06)); border-color: rgba(101,230,166,0.22); }
+    .compare-card.bad { background: linear-gradient(145deg, rgba(255,107,107,0.09), rgba(255,255,255,0.045)); }
+    .compare-card h3 { margin: 0 0 18px; font-size: 24px; letter-spacing: -0.04em; }
+    .check-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 13px; color: var(--muted-2); }
+    .check-list li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; line-height: 1.45; }
+    .yes { color: var(--green); font-weight: 950; }
+    .no { color: var(--red); font-weight: 950; }
+
+    .proof-band {
+      padding: 34px;
+      border-radius: 34px;
+      background:
+        linear-gradient(135deg, rgba(90,167,255,0.16), rgba(101,230,166,0.12)),
+        rgba(255,255,255,0.065);
+      border: 1px solid rgba(255,255,255,0.15);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-top: 24px;
+    }
+    .stat { padding: 20px; border-radius: 24px; background: rgba(5,11,20,0.42); border: 1px solid rgba(255,255,255,0.10); }
+    .stat strong { display: block; font-size: 31px; letter-spacing: -0.055em; margin-bottom: 6px; }
+    .stat span { color: var(--muted-2); font-size: 13px; line-height: 1.35; display: block; }
+
+    .demo-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 32px; align-items: center; }
+    .mini-app {
+      border-radius: 38px;
+      padding: 24px;
+      background: linear-gradient(180deg, #0F2038, #07111F);
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: var(--shadow);
+    }
+    .insight-box {
+      border-radius: 26px;
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 20px;
+      margin-top: 14px;
+    }
+    .bar { height: 11px; border-radius: 99px; background: rgba(255,255,255,0.11); overflow: hidden; margin-top: 9px; }
+    .bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), var(--green)); }
+
+    .drops {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 34px;
+    }
+    .drop-card {
+      min-height: 270px;
+      border-radius: 32px;
+      border: 1px solid rgba(255,255,255,0.14);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.22);
+    }
+    .drop-card::after { content: ""; position: absolute; width: 180px; height: 180px; border-radius: 50%; right: -56px; bottom: -56px; background: rgba(255,255,255,0.16); }
+    .drop-card.bloom { background: linear-gradient(145deg, #F7F0E5, #DFF2D8); color: #14301F; }
+    .drop-card.wim { background: linear-gradient(145deg, #F7F0E5, #0B4B2B 70%); color: #FFFFFF; }
+    .drop-card.stack { background: linear-gradient(145deg, #FFF3C7, #C57924); color: #2D1708; }
+    .drop-label { font-size: 12px; font-weight: 950; letter-spacing: 0.14em; text-transform: uppercase; opacity: .76; margin-bottom: 12px; }
+    .drop-card h3 { margin: 0; font-size: 31px; letter-spacing: -0.06em; }
+    .drop-card p { max-width: 235px; line-height: 1.45; font-weight: 700; opacity: .82; }
+    .drop-emoji { position: absolute; right: 24px; bottom: 18px; font-size: 58px; z-index: 2; }
+
+    .cta {
+      padding: 90px 0;
+    }
+    .cta-card {
+      border-radius: 42px;
+      padding: clamp(30px, 6vw, 62px);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(101,230,166,0.20), transparent 34%),
+        radial-gradient(circle at 90% 5%, rgba(90,167,255,0.24), transparent 34%),
+        linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.055));
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1fr .86fr;
+      gap: 34px;
+      align-items: center;
+    }
+    .cta-card h2 { margin-bottom: 18px; }
+    .signup-options { display: grid; gap: 14px; }
+    .signup-card {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(5,11,20,0.46);
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: transform .2s ease, background .2s ease;
+    }
+    .signup-card:hover { transform: translateY(-2px); background: rgba(5,11,20,0.66); }
+    .signup-card strong { display: block; margin-bottom: 4px; letter-spacing: -0.03em; }
+    .signup-card span { color: var(--muted-2); font-size: 13px; line-height: 1.4; display: block; }
+    .arrow { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.10); display: grid; place-items: center; flex: 0 0 auto; }
+
+    .faq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .faq-card h3 { margin: 0 0 10px; letter-spacing: -0.04em; }
+
+    footer { padding: 42px 0 60px; color: var(--muted); border-top: 1px solid rgba(255,255,255,0.08); }
+    .footer-inner { display: flex; justify-content: space-between; gap: 22px; align-items: center; flex-wrap: wrap; }
+    .footer-links { display: flex; gap: 18px; flex-wrap: wrap; font-size: 14px; }
+    .footer-links a:hover { color: var(--white); }
+
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(12px);
+    }
+    .modal.active { display: grid; }
+    .modal-card {
+      width: min(920px, 100%);
+      height: min(760px, 88vh);
+      background: var(--navy-900);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-rows: 64px 1fr;
+    }
+    .modal-top { display: flex; justify-content: space-between; align-items: center; padding: 0 18px 0 24px; border-bottom: 1px solid rgba(255,255,255,0.10); }
+    .modal-top strong { letter-spacing: -0.03em; }
+    .close { border: 0; background: rgba(255,255,255,0.09); color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; }
+    iframe { width: 100%; height: 100%; border: 0; background: white; }
+
+    @media (max-width: 980px) {
+      .hero-grid, .demo-grid, .cta-card { grid-template-columns: 1fr; }
+      .visual-wrap { min-height: auto; padding-top: 20px; }
+      .float-card { display: none; }
+      .grid-3, .proof-band, .drops { grid-template-columns: repeat(2, 1fr); }
+      .compare { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .mobile-toggle { display: inline-flex; }
+      .nav-links.open {
+        display: grid;
+        position: absolute;
+        top: 76px;
+        left: 20px;
+        right: 20px;
+        padding: 18px;
+        background: rgba(7,17,31,0.96);
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 22px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 28px, var(--max)); }
+      .nav-actions .btn-primary { display: none; }
+      .hero { padding-top: 54px; }
+      .hero-actions .btn { width: 100%; }
+      .grid-3, .grid-2, .proof-band, .drops, .faq-grid { grid-template-columns: 1fr; }
+      .phone { transform: none; min-height: 650px; }
+      .screen { min-height: 614px; }
+      section { padding: 62px 0; }
+      .signup-card { align-items: flex-start; }
+      .footer-inner { align-items: flex-start; }
+      .compare-card { min-height: auto; }
+      .money { font-size: 39px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="shell nav-inner">
+      <a href="#top" class="brand" aria-label="SpendWise home">
+        <span class="mark">S</span>
+        <span>SpendWise</span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="#why">Why SpendWise</a>
+        <a href="#features">Features</a>
+        <a href="#drops">Theme drops</a>
+        <a href="#join">Join</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn btn-secondary mobile-toggle" id="menuBtn" type="button">Menu</button>
+        <a class="btn btn-primary" href="https://tally.so/r/xXZd05" target="_blank" rel="noopener">Join waitlist</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top">
+    <header class="hero shell">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow"><span class="pulse"></span> UK-first Android app · Beta testers wanted</div>
+          <h1>See what you actually bought. <span class="gradient-text">Not just what you spent.</span></h1>
+          <p class="lead">SpendWise turns forgotten receipts into useful spending intelligence. Scan your receipts, see item-level detail, track return deadlines, and ask questions about your spending — with no bank login required.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="https://tally.so/r/Ek0Pv4" target="_blank" rel="noopener">Become a beta tester</a>
+            <a class="btn btn-secondary" href="https://tally.so/r/xXZd05" target="_blank" rel="noopener">Join the waitlist</a>
+          </div>
+          <div class="trust-row" aria-label="SpendWise highlights">
+            <span class="trust-pill">🔒 No bank connection</span>
+            <span class="trust-pill">📸 Receipt scanning</span>
+            <span class="trust-pill">⏰ Return reminders</span>
+            <span class="trust-pill">🇬🇧 Built for UK shoppers</span>
+          </div>
+        </div>
+
+        <div class="visual-wrap" aria-hidden="true">
+          <div class="float-card one reveal">
+            <div class="float-title">Return deadline found</div>
+            <div class="float-copy">SpendWise reminds you before your return window disappears.</div>
+          </div>
+          <div class="phone reveal">
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>SpendWise</span></div>
+              <div class="app-header">
+                <div class="app-kicker">This month</div>
+                <div class="app-title">Good afternoon, Valerian</div>
+              </div>
+              <div class="balance-card">
+                <small>Tracked from receipts</small>
+                <div class="money">£588.40</div>
+                <div class="forecast">↑ Your food shop is trending higher than usual</div>
+              </div>
+              <div class="receipt-card">
+                <div class="row">
+                  <div class="store"><span class="avatar">T</span><span>Tesco</span></div>
+                  <strong>£42.76</strong>
+                </div>
+                <div class="items">
+                  <div class="item-line"><span>Chicken breast fillets</span><strong>£5.49</strong></div>
+                  <div class="item-line"><span>Greek yoghurt</span><strong>£2.10</strong></div>
+                  <div class="item-line"><span>Olive oil</span><strong>£6.25</strong></div>
+                </div>
+              </div>
+              <div class="receipt-card">
+                <div class="row">
+                  <div class="store"><span class="avatar" style="background:#00A6A6">B</span><span>Boots</span></div>
+                  <strong>£18.99</strong>
+                </div>
+                <div class="forecast">Return window closes in 7 days</div>
+              </div>
+              <div class="scan-fab">⌁</div>
+            </div>
+          </div>
+          <div class="float-card two reveal">
+            <div class="float-title">Ask Sage</div>
+            <div class="float-copy">“What did I keep buying from Tesco this month?”</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="why" class="problem">
+      <div class="shell">
+        <div class="section-head reveal">
+          <div class="section-kicker">The problem</div>
+          <h2>Your bank app knows the shop. It does not know the basket.</h2>
+          <p class="section-copy">A bank statement can show Tesco, Boots, Amazon, or Greggs. But it cannot tell you whether that spend was food, toiletries, repeat items, impulse buys, returns you forgot about, or patterns hiding inside the receipt.</p>
+        </div>
+        <div class="compare">
+          <div class="compare-card bad reveal">
+            <h3>What you get from a bank app</h3>
+            <ul class="check-list">
+              <li><span class="no">×</span><span>One transaction total with no product detail.</span></li>
+              <li><span class="no">×</span><span>No item-level memory of what you actually bought.</span></li>
+              <li><span class="no">×</span><span>No return deadline reminders from your receipts.</span></li>
+              <li><span class="no">×</span><span>Often needs Open Banking or account connection.</span></li>
+            </ul>
+          </div>
+          <div class="compare-card good reveal">
+            <h3>What SpendWise adds</h3>
+            <ul class="check-list">
+              <li><span class="yes">✓</span><span>Receipt scanning that extracts real items and prices.</span></li>
+              <li><span class="yes">✓</span><span>Spending insights built from what was inside the basket.</span></li>
+              <li><span class="yes">✓</span><span>Return deadline tracking before money is lost.</span></li>
+              <li><span class="yes">✓</span><span>No bank login, no credential anxiety, no broken connections.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="shell">
+        <div class="section-head reveal">
+          <div class="section-kicker">Built differently</div>
+          <h2>The app your receipts have been waiting for.</h2>
+          <p class="section-copy">SpendWise is designed for people who already shop like normal — they just want the receipt to finally do something useful afterwards.</p>
+        </div>
+        <div class="grid-3">
+          <article class="feature-card reveal">
+            <div class="icon">📸</div>
+            <h3>Scan receipts in seconds</h3>
+            <p>Use the camera or gallery to capture a receipt and turn it into organised spending data with item names, prices, categories, and store detail.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="icon">🧾</div>
+            <h3>Item-level spending</h3>
+            <p>See what you actually bought, not just where your money went. Perfect for spotting repeat purchases, rising basket costs, and sneaky categories.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="icon">⏰</div>
+            <h3>Return deadline tracking</h3>
+            <p>SpendWise tracks return windows and reminds you before they expire, so a forgotten receipt does not quietly become lost money.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="icon">📍</div>
+            <h3>Receipt Radar</h3>
+            <p>When enabled, SpendWise can remind you to scan after leaving a shop, while the receipt is still in your hand instead of buried in a bag.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="icon">✨</div>
+            <h3>Spending Memory</h3>
+            <p>Ask Sage questions like “What did I spend most on this month?” or “Which store keeps costing me more?” using your real receipt history.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="icon">🔒</div>
+            <h3>No bank login. Ever.</h3>
+            <p>SpendWise does not need your bank credentials. It learns from receipts directly, so there are no account links to break or reconnect.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell demo-grid">
+        <div class="mini-app reveal">
+          <div class="app-kicker">SpendWise says</div>
+          <div class="insight-box">
+            <strong>Your grocery basket is doing the heavy lifting this month.</strong>
+            <p style="color: var(--muted-2); line-height: 1.55; margin: 10px 0 0;">Tesco and Lidl make up most of your tracked spend, and repeat household items are appearing more often than food-on-the-go.</p>
+          </div>
+          <div class="insight-box">
+            <div class="row"><span>Groceries goal</span><strong>89%</strong></div>
+            <div class="bar"><span style="width: 89%"></span></div>
+          </div>
+          <div class="insight-box">
+            <div class="row"><span>Food & Drink goal</span><strong style="color: var(--red)">108%</strong></div>
+            <div class="bar"><span style="width: 100%; background: linear-gradient(90deg, var(--amber), var(--red));"></span></div>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="section-kicker">Why it matters</div>
+          <h2>Most receipts are thrown away before they become useful.</h2>
+          <p class="section-copy" style="margin-left:0;">That is the whole point. SpendWise is for the person who thinks, “I’ve always been fine without receipts.” You might have been fine — but you have also been missing the details that explain your spending.</p>
+          <div class="proof-band">
+            <div class="stat"><strong>0</strong><span>Bank accounts to connect</span></div>
+            <div class="stat"><strong>15</strong><span>Free receipt scans per month planned</span></div>
+            <div class="stat"><strong>7/3/1</strong><span>Return reminders before expiry</span></div>
+            <div class="stat"><strong>UK</strong><span>Stores, currency, dates, and language first</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="drops">
+      <div class="shell">
+        <div class="section-head reveal">
+          <div class="section-kicker">Seasonal drops</div>
+          <h2>Personal finance does not have to feel lifeless.</h2>
+          <p class="section-copy">SpendWise includes limited-window theme drops that re-skin the app for cultural moments — a playful retention layer you rarely see in finance apps.</p>
+        </div>
+        <div class="drops">
+          <article class="drop-card bloom reveal">
+            <div class="drop-label">Spring drop · Easter</div>
+            <h3>Bloom</h3>
+            <p>Cream, soft green, pastel details, petals, blossom icons, and spring celebration moments.</p>
+            <div class="drop-emoji">🌸</div>
+          </article>
+          <article class="drop-card wim reveal">
+            <div class="drop-label">Summer drop · Wimbledon</div>
+            <h3>Strawberries</h3>
+            <p>Grass-court green, berry red, Wimbledon purple, racket icons, and berry celebrations.</p>
+            <div class="drop-emoji">🍓</div>
+          </article>
+          <article class="drop-card stack reveal">
+            <div class="drop-label">Shrove Tuesday drop</div>
+            <h3>Stack</h3>
+            <p>Pancake flips, syrup splashes, warm cream tones, and playful goal-card moments.</p>
+            <div class="drop-emoji">🥞</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="join" class="cta">
+      <div class="shell">
+        <div class="cta-card reveal">
+          <div>
+            <div class="section-kicker">Get early access</div>
+            <h2>Help shape SpendWise before it reaches more UK shoppers.</h2>
+            <p class="section-copy" style="margin-left:0;">Join the general waitlist, or become a beta tester and help test the Android app before wider release. Both forms are quick, simple, and hosted with Tally.</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" type="button" data-modal="beta">Open beta tester form</button>
+              <button class="btn btn-secondary" type="button" data-modal="waitlist">Open waitlist form</button>
+            </div>
+          </div>
+          <div class="signup-options">
+            <a class="signup-card" href="https://tally.so/r/Ek0Pv4" target="_blank" rel="noopener">
+              <span><strong>Become a beta tester</strong><span>Best if you can install, test, and give feedback on the Android app.</span></span>
+              <span class="arrow">→</span>
+            </a>
+            <a class="signup-card" href="https://tally.so/r/xXZd05" target="_blank" rel="noopener">
+              <span><strong>Join the waitlist</strong><span>Best if you want updates and launch access when SpendWise becomes available.</span></span>
+              <span class="arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell">
+        <div class="section-head reveal">
+          <div class="section-kicker">Questions</div>
+          <h2>Quick answers before you join.</h2>
+        </div>
+        <div class="faq-grid">
+          <article class="faq-card reveal">
+            <h3>Does SpendWise connect to my bank?</h3>
+            <p>No. SpendWise is built around receipts, so you do not need to connect a bank account or share banking credentials.</p>
+          </article>
+          <article class="faq-card reveal">
+            <h3>Is SpendWise only for Android?</h3>
+            <p>The current launch focus is Android and Google Play testing. The codebase is planned with future iOS support in mind.</p>
+          </article>
+          <article class="faq-card reveal">
+            <h3>What makes it different from budgeting apps?</h3>
+            <p>Most budgeting apps categorise transactions. SpendWise focuses on receipt-level detail — the products, prices, returns, and patterns inside the basket.</p>
+          </article>
+          <article class="faq-card reveal">
+            <h3>Who should become a beta tester?</h3>
+            <p>Anyone in the UK who shops regularly, can install the Android app, and is willing to give honest feedback before public launch.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner">
+      <div>
+        <div class="brand"><span class="mark">S</span><span>SpendWise</span></div>
+        <p style="margin: 14px 0 0; max-width: 520px; line-height: 1.55;">The UK-first receipt intelligence app. Scan receipts. See item-level detail. Track return deadlines. Never lose money to a missed return again.</p>
+      </div>
+      <div class="footer-links">
+        <a href="mailto:reach.spendwise@gmail.com">Contact</a>
+        <a href="https://tally.so/r/xXZd05" target="_blank" rel="noopener">Waitlist</a>
+        <a href="https://tally.so/r/Ek0Pv4" target="_blank" rel="noopener">Beta testers</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="waitlistModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-top"><strong>Join the SpendWise waitlist</strong><button class="close" type="button" aria-label="Close modal">×</button></div>
+      <iframe src="https://tally.so/r/xXZd05" title="SpendWise waitlist form"></iframe>
+    </div>
+  </div>
+
+  <div class="modal" id="betaModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-top"><strong>Become a SpendWise beta tester</strong><button class="close" type="button" aria-label="Close modal">×</button></div>
+      <iframe src="https://tally.so/r/Ek0Pv4" title="SpendWise beta tester form"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const navLinks = document.getElementById('navLinks');
+    if (menuBtn && navLinks) {
+      menuBtn.addEventListener('click', () => navLinks.classList.toggle('open'));
+      navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('open')));
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    const waitlistModal = document.getElementById('waitlistModal');
+    const betaModal = document.getElementById('betaModal');
+    document.querySelectorAll('[data-modal]').forEach(button => {
+      button.addEventListener('click', () => {
+        const modal = button.dataset.modal === 'beta' ? betaModal : waitlistModal;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      });
+    });
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', event => {
+        if (event.target === modal || event.target.classList.contains('close')) {
+          modal.classList.remove('active');
+          modal.setAttribute('aria-hidden', 'true');
+        }
+      });
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        document.querySelectorAll('.modal.active').forEach(modal => {
+          modal.classList.remove('active');
+          modal.setAttribute('aria-hidden', 'true');
+        });
+      }
+    });
+  </script>
+</body>
+</html>
